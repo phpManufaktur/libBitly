@@ -110,4 +110,4 @@ if (!$cfg->createTable()) {
 }
 
 if (!file_exists(LEPTON_PATH.'/temp/unzip/')) @mkdir(LEPTON_PATH.'/temp/unzip/');
-wb_unpack_and_import(LEPTON_PATH.'/modules/'.basename(dirname(__FILE__)).'/samples/bitlyGetBundleContents/droplet_bitly_get_bundle_contents.zip', LEPTON_PATH.'/temp/unzip/');
+wb_unpack_and_import(LEPTON_PATH.'/modules/lib_bitly/samples/bitlyGetBundleContents/droplet_bitly_get_bundle_contents.zip', LEPTON_PATH.'/temp/unzip/');
