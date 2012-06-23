@@ -31,7 +31,11 @@ else {
 }
 // end include class.secure.php
 
-require_once WB_PATH.'/modules/lib_bitly/library.php';
+// wb2lepton compatibility
+if (!defined('LEPTON_PATH'))
+  require_once WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/wb2lepton.php';
+
+require_once LEPTON_PATH.'/modules/lib_bitly/library.php';
 
 global $admin;
 
