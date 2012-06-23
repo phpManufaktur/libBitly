@@ -67,13 +67,13 @@ function getBundleContents($bundle_link) {
   global $bitly;
   global $thumb_width;
   global $thumb_height;
-
+  global $bundle_explain;
+  // get the bundle content
   if (false === ($bundles = $bitly->bitlyGetBundleContents($bundle_link)))
     return errorMessage($bitly->getError());
+  // init the thumbnail library
   $thumbnail = new libWebThumbnail();
-echo "<pre>";
-print_r($bundles);
-echo "</pre>";
+  // set the bundle data
   $bundle = array(
       'image_url' => $bundles['og_image'],
       'owner' => $bundles['bundle_owner'],
@@ -81,18 +81,42 @@ echo "</pre>";
       'description' => $bundles['description'],
       'title' => $bundles['title'],
       'last_modified' => $bundles['last_modified_ts'],
-      'link' => $bundles['bundle_link']
+      'link' => $bundles['bundle_link'],
+      'explain' => $bundle_explain
       );
   $links = array();
+  $user = array();
+  // walk through the links and set the data
   foreach ($bundles['links'] as $link) {
-    $comments = array();
+    // get the params for the thumbnail creation
     $params = $thumbnail->getParams();
+    // set the updated/changed params
     $params[libWebThumbnail::PARAM_URL] = $link['long_url'];
     $params[libWebThumbnail::PARAM_WIDTH] = $thumb_width;
     $params[libWebThumbnail::PARAM_HEIGHT] = $thumb_height;
+    $params[libWebThumbnail::PARAM_PAGE_ID] = PAGE_ID;
+    $params[libWebThumbnail::PARAM_ALT] = $link['title'];
+    $params[libWebThumbnail::PARAM_TITLE] = $link['title'];
     $thumbnail->setParams($params);
+    // get the thumbnail for this link
     if (false === ($thumb = $thumbnail->getImageTag()))
       return errorMessage($thumbnail->getError());
+    // walk through the comments for this link
+    $comments = array();
+    foreach ($link['comments'] as $comment) {
+      if (!isset($user[$comment['user']])) {
+        $info = $bitly->bitlyGetUserInfo($comment['user']);
+        $user[$comment['user']] = $info;
+      }
+      $comments[] = array(
+          'text' => $comment['text'],
+          'user_name' => $comment['user'],
+          'user_image' => isset($user[$comment['user']]['profile_image']) ? $user[$comment['user']]['profile_image'] : null,
+          'user_full_name' => isset($user[$comment['user']]['full_name']) ? $user[$comment['user']]['full_name'] : $comment['user'],
+          'user_profile_link' => isset($user[$comment['user']]['profile_url']) ? $user[$comment['user']]['profile_url'] : null,
+          'last_modified' => (int) $comment['lm']
+          );
+    } // foreach comments
     $links[$link['display_order']] = array(
         'title' => $link['title'],
         'last_modified' => $link['lm'],
@@ -124,9 +148,11 @@ if (!isset($url))
 
 global $thumb_width;
 global $thumb_height;
+global $bundle_explain;
 
-$thumb_width = (isset($width)) ? (int) $width : 150;
-$thumb_height = (isset($height)) ? (int) $height : 150;
+$thumb_width = (isset($width)) ? (int) $width : 200;
+$thumb_height = (isset($height)) ? (int) $height : 200;
+$bundle_explain = (isset($explain) && (strtolower($explain) == 'true')) ? 1 : 0;
 
 if ($bitly->existsAccessToken()) {
   // already authenticated, get the bundle

@@ -19,17 +19,33 @@
   margin: 0;
   padding: 0;
   font-size: 12px;
+  width: 710px;
+  height: auto;
 }
 .bitly_bundle_description {
   font-size: 11px;
-  font-style: italic;
+  font-style: normal;
   margin: 0;
   padding: 10px 0;
 }
 .bitly_bundle_image {
   float: left;
   margin: 0;
-  padding: 0 20px 20px 0; 
+  padding: 0 30px 30px 0; 
+  width: 200px;
+}
+.bitly_bundle_last_update {
+  clear: both;
+  margin: 20px 0 20px 0;
+  padding: 0;
+  text-align: right;
+  font-size: 10px;
+}
+.bitly_bundle_explain {
+  margin: 0;
+  padding: 10px 0 0 0;
+  font-style: italic;
+  font-size: 10px;
 }
 #bitly_links_loop {
   clear: both;
@@ -50,13 +66,37 @@
 .bitly_link_content {
   margin: 0;
   padding: 0;
-  float: left;
+  float: right;
+  width: 470px;
 }
 .bitly_long_url {
   font-size: 11px;
   font-weight: normal;
+  padding: 10px 0;
 }
 .bitly_link_title {
   font-size: 14px;
   font-weight: normal; 
+}
+.bitly_comment_item {
+  clear: left;
+  margin: 0;
+  padding: 10px 0 0 0;
+}
+.bitly_comment_image {
+  float: left;
+  margin: 0;
+  padding: 0 16px 16px 0;
+}
+.bitly_comment_text {
+  float: left;
+  margin: 0;
+  padding: 0;
+  width: 430px;
+  font-size: 11px; 
+}
+.bitly_comment_user {
+  font-size: 10px;
+  text-align: right;
+  padding: 10px 0 0 0;
 }

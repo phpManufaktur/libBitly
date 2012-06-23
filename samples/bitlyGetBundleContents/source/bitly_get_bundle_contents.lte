@@ -17,9 +17,15 @@
   <h2>{$bundle['title']}</h2>
   <div class="bitly_bundle_description">
     <div class="bitly_bundle_image">
-      <img src="{$bundle['image_url']}" alt="{$bundle['title']}" width="150" />
+      <img src="{$bundle['image_url']}" alt="{$bundle['title']}" width="200" />
     </div> 
     {$bundle['description']}
+    {if ($bundle['explain'] == '1')} 
+    <div class="bitly_bundle_explain">
+      <p>Bitte helfen Sie mit, diese Linkliste mit interessanten und nützlichen Links zu Open Source und Freier Software zu ergänzen!</p>
+      <p>Es ist ganz einfach: <a href="{$bundle['link']}" target="_blank">diese Liste wird öffentlich auf bit.ly gepflegt</a>, Sie können dort jederzeit Links hinzufügen und kommentieren. Alle Änderungen werden sofort hier übernommen und angezeigt.</p>
+    </div>
+    {/if}
   </div>
   <div id="bitly_links_loop">
     {foreach $links link}
@@ -28,11 +34,28 @@
       <div class="bitly_link_content">
         <div class="bitly_link_title">{$link['title']}</div>
         <div class="bitly_long_url">
-          <a href="{$link['long_url']}">{$link['long_url']}</a>
+          <a href="{$link['long_url']}" target="_blank">{$link['long_url']}</a>
+        </div> 
+        {foreach $link['comments'] comment}
+        <div class="bitly_comment_item">
+          <div class="bitly_comment_image">
+            {if isset($comment['user_image'])}
+            <a href="{$comment['user_profile_link']}" target="_blank">
+              <img src="{$comment['user_image']}" alt="{$comment['user_full_name']}" title="{$comment['user_full_name']}" />
+            </a>
+            {/if}
+          </div>
+          <div class="bitly_comment_text"> 
+            {$comment['text']}
+            <div class="bitly_comment_user">
+              {$comment['user_full_name']} (<a href="{$comment['user_profile_link']}" target="_blank">{$comment['user_name']}</a>) - {date_format($comment['last_modified'], '%d.%m.%Y - %R')}
+            </div>
+          </div>
         </div>
+        {/foreach}
       </div>
     </div>
     {/foreach}
   </div>
-  <div class="bitly_last_update">Stand: {date_format($bundle['last_modified'], '%d.%m.%Y - %R')}</div>
+  {* <div class="bitly_bundle_last_update">Stand: {date_format($bundle['last_modified'], '%d.%m.%Y - %R')}</div> *}
 </div>   
