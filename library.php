@@ -31,6 +31,10 @@ else {
 }
 // end include class.secure.php
 
+// wb2lepton compatibility
+if (!defined('LEPTON_PATH'))
+  require_once WB_PATH.'/modules/'.basename(dirname(__FILE__)).'/wb2lepton.php';
+
 if (!defined('CFG_TIME_ZONE'))
   define('CFG_TIME_ZONE', 'Europe/Berlin');
 
@@ -177,16 +181,19 @@ class bitlyAccess {
    * Constructor for bitlyAccess
    */
   public function __construct() {
-    self::$bitly_config = WB_PATH.'/modules/lib_bitly/config.json';
+    self::$bitly_config = LEPTON_PATH.'/modules/lib_bitly/config.json';
     $this->cfg = new bitlyConfig();
     $this->getConfiguration();
     $this->curl_options = array(
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_USERAGENT => 'libBitly'
         );
   } // __construct()
 
   /**
+   * Return the active error
+   *
    * @return string $error
    */
   public function getError() {
@@ -194,6 +201,8 @@ class bitlyAccess {
   }
 
   /**
+   * Set the active error to $error
+   *
    * @param string $error
    */
   protected function setError($error='') {
@@ -201,7 +210,7 @@ class bitlyAccess {
   }
 
   /**
-   * Check if $this->message is empty
+   * Check if $self::error is empty
    *
    * @return boolean
    */
@@ -274,10 +283,22 @@ class bitlyAccess {
     return $this->access_token;
   } // getAccessToken()
 
+  /**
+   * Get the cURL options
+   *
+   * @return array
+   */
   protected function getCurlOptions() {
     return $this->curl_options;
   } // getCurlOptions()
 
+  /**
+   * Execute a cURL PUT command to bitly and return the result or set the HTTP
+   * Code as error status
+   *
+   * @param string $command URL with all params to execute
+   * @return mixed|boolean
+   */
   protected function put($command) {
     $ch = curl_init();
     $options = $this->getCurlOptions();
@@ -296,6 +317,13 @@ class bitlyAccess {
     }
   } // put()
 
+  /**
+   * Execute a cURL GET command to bitly and return the result or set the HTTP
+   * code as error status
+   *
+   * @param string $command URL with all params to execute
+   * @return mixed|boolean
+   */
   protected function get($command) {
     $ch = curl_init();
     $options = $this->getCurlOptions();
@@ -311,8 +339,13 @@ class bitlyAccess {
       $this->setError(sprintf('[%s - %s] %s: %s', __METHOD__, __LINE__, $status['http_code'], $result));
       return false;
     }
-  }
+  } // get()
 
+  /**
+   * Create the bit.ly URL to get the authorization code
+   *
+   * @return string URL
+   */
   public function bitlyGetAuthorizationCodeURL() {
     $url = sprintf('%s%s?%s',
         'https://bitly.com',
@@ -325,6 +358,14 @@ class bitlyAccess {
     return $url;
   }
 
+  /**
+   * PUT the client ID, Secret and Code to bit.ly to get an valid Access Token.
+   * The Access Token, login and API key will be saved in the libBitly configuration
+   * record.
+   *
+   * @param string $code
+   * @return boolean
+   */
   public function bitlyGetAccessToken($code) {
     $url = sprintf('%s%s?%s',
         $this->bitly_url,
@@ -372,7 +413,12 @@ class bitlyAccess {
     }
   } // bitlyGetAccessToekn()
 
-
+  /**
+   * GET the information record for the desired $user from bit.ly
+   *
+   * @param string $user
+   * @return boolean|mixed
+   */
   public function bitlyGetUserInfo($user) {
     $url = sprintf('%s%s?%s',
         $this->bitly_url,
@@ -382,15 +428,22 @@ class bitlyAccess {
             'login' => $user,
         ))
     );
-    if (false === ($result = $this->get($url))) {
-      return false;
-    }
-    else {
-      $result = json_decode($result, true);
+    if (false === ($result = $this->get($url))) return false;
+
+    $result = json_decode($result, true);
+    if ($result['status_code'] == 200)
       return $result['data'];
-    }
+    // something went wrong, return the status code and text
+    $this->setError(sprintf('[%s - %s] Error code: %d - %s', __METHOD__, __LINE__,
+        $result['status_code'], $result['status_txt']));
+    return false;
   } // bitlyGetUserInfo()
 
+  /**
+   * GET the bundles for the configured user
+   *
+   * @return mixed|boolean
+   */
   public function bitlyGetBundlesByUser() {
     $url = sprintf('%s%s?%s',
         $this->bitly_url,
@@ -400,15 +453,23 @@ class bitlyAccess {
             'user' => $this->login_name,
             ))
         );
-    if (false === ($result = $this->get($url))) {
-      return false;
-    }
-    else {
-      $result = json_decode($result, true);
+    if (false === ($result = $this->get($url))) return false;
+
+    $result = json_decode($result, true);
+    if ($result['status_code'] == 200)
       return $result['data']['bundles'];
-    }
+    // something went wrong, return the status code and text
+    $this->setError(sprintf('[%s - %s] Error code: %d - %s', __METHOD__, __LINE__,
+        $result['status_code'], $result['status_txt']));
+    return false;
   } // bitlyGetBundlesByUser()
 
+  /**
+   * GET the bundle contents for the desired bundle link
+   *
+   * @param string $bundle_link bit.ly URL to the bundle
+   * @return mixed|boolean
+   */
   public function bitlyGetBundleContents($bundle_link) {
     $url = sprintf('%s%s?%s',
         $this->bitly_url,
