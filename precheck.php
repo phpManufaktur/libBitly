@@ -30,3 +30,38 @@ else {
   }
 }
 // end include class.secure.php
+
+$PRECHECK['PHP_VERSION'] = array('VERSION' => '5.2.0', 'OPERATOR' => '>=');
+
+// check utf-8
+global $database;
+$SQL = "SELECT `value` FROM `".TABLE_PREFIX."settings` WHERE `name`='default_charset'";
+$charset = $database->get_one($SQL, MYSQL_ASSOC);
+
+// check allow_url_open and cURL
+$url_status = (ini_get('allow_url_fopen') == 1) ? 'enabled' : 'disabled';
+$curl_status = function_exists('curl_init') ? 'loaded' : 'missing';
+$json_status = function_exists('json_decode') ? 'loaded' : 'missing';
+
+if ($result) {
+  $PRECHECK['CUSTOM_CHECKS'] = array(
+      'Default Charset' => array(
+          'REQUIRED' 	=> 'utf-8',
+          'ACTUAL' 		=> $charset,
+          'STATUS' 		=> ($charset === 'utf-8')),
+      'allow_url_open' => array(
+          'REQUIRED'	=> 'enabled',
+          'ACTUAL'		=> $url_status,
+          'STATUS'		=> ($url_status == 'enabled')),
+      'cURL extension' => array(
+          'REQUIRED' => 'loaded',
+          'ACTUAL' => $curl_status,
+          'STATUS' => ($curl_status == 'loaded')
+      ),
+      'JSON extension' => array(
+          'REQUIRED' => 'loaded',
+          'ACTUAL' => $json_status,
+          'STATUS' => ($json_status == 'loaded')
+      )
+  );
+}
