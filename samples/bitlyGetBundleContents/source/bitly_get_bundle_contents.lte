@@ -1,0 +1,38 @@
+{*
+ * libBitly
+ *
+ * @author Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+ * @link http://phpmanufaktur.de
+ * @copyright 2012
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+ *
+ * Please consult the Dwoo Documentation & WIKI to get further informations 
+ * and hints for the usage of the Dwoo template engine.
+ *
+ * @link http://wiki.dwoo.org/
+ *
+ * Use {dump()} to get a list of all in this template available variables!
+ *}
+<div id="bitly_bundle_contents">
+  <h2>{$bundle['title']}</h2>
+  <div class="bitly_bundle_description">
+    <div class="bitly_bundle_image">
+      <img src="{$bundle['image_url']}" alt="{$bundle['title']}" width="150" />
+    </div> 
+    {$bundle['description']}
+  </div>
+  <div id="bitly_links_loop">
+    {foreach $links link}
+    <div class="bitly_link_item">
+      <div class="bitly_link_thumbnail">{$link['img_url']}</div>
+      <div class="bitly_link_content">
+        <div class="bitly_link_title">{$link['title']}</div>
+        <div class="bitly_long_url">
+          <a href="{$link['long_url']}">{$link['long_url']}</a>
+        </div>
+      </div>
+    </div>
+    {/foreach}
+  </div>
+  <div class="bitly_last_update">Stand: {date_format($bundle['last_modified'], '%d.%m.%Y - %R')}</div>
+</div>   
