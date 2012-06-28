@@ -60,7 +60,7 @@
 .bitly_link_thumbnail {
   clear: both;
   margin: 0;
-  padding: 0 30px 0 0;
+  padding: 0 18px 0 0;
   float: left;
 }
 .bitly_link_content {
@@ -86,13 +86,13 @@
 .bitly_comment_image {
   float: left;
   margin: 0;
-  padding: 0 16px 16px 0;
+  padding: 0 6px 16px 0;
 }
 .bitly_comment_text {
   float: left;
   margin: 0;
   padding: 0;
-  width: 430px;
+  width: 420px;
   font-size: 11px; 
 }
 .bitly_comment_user {

@@ -73,7 +73,7 @@ class bitlyConfig {
         "`cfg_api_key` VARCHAR(255) NOT NULL DEFAULT '', ".
         "`cfg_timestamp` TIMESTAMP, ".
         "PRIMARY KEY (`cfg_id`) ".
-        " ) ENGINE=MyIsam DEFAULT CHARSET utf8 COLLATE utf8_general_ci";
+        " ) ENGINE=MyIsam DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci";
     $database->query($SQL);
     if ($database->is_error()) {
       $this->setError(sprintf('[%s - %s] %s', __METHOD__, __LINE__, $database->get_error()));
